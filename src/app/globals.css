@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+/* Tailwind v4 only loads a JS config when it is referenced explicitly. */
+@config "../../tailwind.config.ts";
+
+:root {
+  /* Surfaces */
+  --stone: #f1ede6;
+  --paper: #fbf9f5;
+
+  /* Text and accents */
+  --ink: #26221e;
+  --ink2: #58534e;
+  --taupe: #8c7a63;
+
+  /* Status */
+  --good: #4a7c59;
+  --warn: #b8862d;
+  --crit: #a6402e;
+
+  /* Semantic aliases */
+  --background: var(--stone);
+  --foreground: var(--ink);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
