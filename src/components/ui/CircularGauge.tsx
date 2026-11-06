@@ -81,7 +81,7 @@ export function CircularGauge({
           y={CENTER}
           textAnchor="middle"
           dominantBaseline="central"
-          className="fill-ink text-[20px] font-semibold tabular-nums"
+          className="fill-ink font-display text-[22px] tabular-nums"
         >
           {hasValue ? valueFormat.format(value) : "—"}
           {hasValue && (

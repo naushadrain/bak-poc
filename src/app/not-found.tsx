@@ -7,7 +7,7 @@ export default function NotFound() {
     <div className="flex flex-1 items-center justify-center p-4 sm:p-6 lg:p-8">
       <Card className="flex w-full max-w-md flex-col items-center gap-3 p-8 text-center">
         <SearchX aria-hidden="true" className="size-10 text-taupe" />
-        <h2 className="text-xl font-semibold text-ink">Page Not Found</h2>
+        <h2 className="font-display text-2xl font-normal text-ink">Page Not Found</h2>
         <p className="text-sm text-ink2">This page doesn&apos;t exist or hasn&apos;t been built yet.</p>
         <Link
           href="/"

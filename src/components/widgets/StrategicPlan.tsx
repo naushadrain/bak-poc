@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus, RotateCcw, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { useActionPlan } from "@/controllers/hooks/useActionPlan";
 import { cn } from "@/lib/utils";
 import type { ActionStatus } from "@/models/constants/actionPlan";
@@ -32,13 +33,10 @@ export function StrategicPlan() {
   return (
     <Card className="flex flex-col gap-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h2 className="text-base font-semibold text-ink">Quarterly Action Plan</h2>
-          <p className="text-xs text-ink2">
-            {openCount} open, {completedCount} completed. Click text to edit and a status to change
-            it. Changes last for this browser session only.
-          </p>
-        </div>
+        <SectionHeader
+          title="Quarterly Action Plan"
+          subtitle={`${openCount} open, ${completedCount} completed. Click text to edit and a status to change it. Changes last for this browser session only.`}
+        />
         <button
           type="button"
           onClick={resetItems}
@@ -52,7 +50,7 @@ export function StrategicPlan() {
       {items.length === 0 ? (
         <p className="text-sm text-ink2">No actions yet.</p>
       ) : (
-        <ul className="divide-y divide-ink/10">
+        <ul className="divide-y divide-line">
           <AnimatePresence initial={false}>
             {items.map(({ id, text, quarter, status }) => (
               <motion.li

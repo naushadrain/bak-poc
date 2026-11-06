@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { CircularGauge } from "@/components/ui/CircularGauge";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { SkeletonLoader } from "@/components/ui/SkeletonLoader";
 import type { PortalDataState } from "@/controllers/hooks/usePortalData";
 import { formatScore } from "@/lib/format";
@@ -27,12 +28,12 @@ export function AssetLeaderboard({ assets }: { assets: PortalDataState<AssetMgmt
 
   return (
     <Card className="flex flex-col gap-4">
-      <h2 className="text-base font-semibold text-ink">Asset Health Leaderboard</h2>
+      <SectionHeader title="Asset Health Leaderboard" subtitle="All estates, healthiest first" />
 
       {assets.isLoading ? (
         <SkeletonLoader lines={8} className="h-7" label="Loading asset health" />
       ) : assets.error ? (
-        <ErrorMessage>Asset health is unavailable. {assets.error.message}</ErrorMessage>
+        <ErrorMessage error={assets.error}>Asset health is unavailable. {assets.error.message}</ErrorMessage>
       ) : ranked.length === 0 ? (
         <p className="text-sm text-ink2">No estate data was returned.</p>
       ) : (
@@ -43,7 +44,7 @@ export function AssetLeaderboard({ assets }: { assets: PortalDataState<AssetMgmt
             unit="/100"
             className="self-center"
           />
-          <ol className="divide-y divide-ink/10">
+          <ol className="divide-y divide-line">
             {ranked.map(({ estate_code, asset_health_idx }, index) => {
               const hasScore = isNumber(asset_health_idx);
               const status = hasScore ? getStatus(asset_health_idx) : null;

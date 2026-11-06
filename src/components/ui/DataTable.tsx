@@ -119,7 +119,7 @@ export function DataTable<T>({
           role="region"
           aria-label={label}
           tabIndex={0}
-          className={cn("overflow-auto rounded-b-lg border-t border-ink/10", scrollClassName)}
+          className={cn("overflow-auto rounded-b-md border-t border-line", scrollClassName)}
         >
           <table className="w-full border-collapse text-sm">
             <thead>
@@ -127,7 +127,7 @@ export function DataTable<T>({
                 {renderExpanded && (
                   <th
                     scope="col"
-                    className="sticky top-0 z-10 w-10 bg-stone shadow-[inset_0_-1px_0] shadow-ink/10"
+                    className="sticky top-0 z-10 w-10 bg-stone shadow-[inset_0_-1px_0] shadow-line"
                   >
                     <span className="sr-only">Details</span>
                   </th>
@@ -137,7 +137,7 @@ export function DataTable<T>({
                     key={column.key}
                     scope="col"
                     className={cn(
-                      "sticky top-0 z-10 bg-stone px-4 py-2.5 text-xs font-semibold whitespace-nowrap text-ink2 shadow-[inset_0_-1px_0] shadow-ink/10",
+                      "sticky top-0 z-10 bg-stone px-4 py-2.5 text-[11px] font-medium tracking-wider whitespace-nowrap text-ink2 uppercase shadow-[inset_0_-1px_0] shadow-line",
                       ALIGN_CLASSES[column.align ?? "left"],
                     )}
                   >

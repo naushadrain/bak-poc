@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
 import { DataTable, type DataTableColumn } from "@/components/ui/DataTable";
-import { KpiTile } from "@/components/widgets/KpiStrip";
+import { KpiGrid, KpiTile } from "@/components/ui/KpiTile";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import type { PortalDataState } from "@/controllers/hooks/usePortalData";
 import { formatAedMillions, formatCount, formatPercent, formatScore } from "@/lib/format";
-import { getPortfolioHealth, isNumber, splitPortfolio } from "@/lib/portfolio";
+import { getPortfolioHealth, isNumber, splitPortfolio, sumOf } from "@/lib/portfolio";
 import { getStatus, STATUS_LABELS } from "@/lib/status";
 import type { AssetMgmt } from "@/models/interfaces";
 
@@ -15,11 +15,6 @@ const NO_VALUE = "—";
 
 function show(value: number | null | undefined, format: (value: number) => string) {
   return isNumber(value) ? format(value) : NO_VALUE;
-}
-
-function sumOf(rows: AssetMgmt[], pick: (row: AssetMgmt) => number | null) {
-  const values = rows.map(pick).filter(isNumber);
-  return values.length > 0 ? values.reduce((total, value) => total + value, 0) : null;
 }
 
 const COLUMNS: DataTableColumn<AssetMgmt>[] = [
@@ -86,7 +81,7 @@ export function LifecycleOverview({ assets }: { assets: PortalDataState<AssetMgm
 
   return (
     <div className="space-y-6">
-      <section aria-label="Asset totals" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <KpiGrid label="Asset totals">
         <KpiTile label="Total Assets" state={assets} value={show(totalAssets, formatCount)} detail="Active assets across the portfolio" />
         <KpiTile
           label="Asset Health"
@@ -101,10 +96,10 @@ export function LifecycleOverview({ assets }: { assets: PortalDataState<AssetMgm
           value={show(portfolio?.spares_value_aed_m, (value) => formatAedMillions(value * 1_000_000))}
           detail="Portfolio stock on hand"
         />
-      </section>
+      </KpiGrid>
 
       {assets.error ? (
-        <ErrorMessage>Estate asset data is unavailable. {assets.error.message}</ErrorMessage>
+        <ErrorMessage error={assets.error}>Estate asset data is unavailable. {assets.error.message}</ErrorMessage>
       ) : (
         <DataTable
           label="Assets by estate"

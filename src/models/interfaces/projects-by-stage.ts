@@ -2,8 +2,8 @@ export interface ProjectsByStage {
   estate_code: string;
   kpi_id: string;
   kpi_name: string;
-  /** Count in sample data. May arrive as text, as gold KPI values are mixed. */
-  value: string | number;
+  /** Always text, including for numeric KPIs such as counts. */
+  value: string;
   unit: string;
   client_code: string;
   tier: number;

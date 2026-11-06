@@ -8,15 +8,10 @@ const COLUMNS: DataTableColumn<DictionaryEndpoint>[] = [
   {
     key: "route",
     header: "Endpoint",
-    value: (row) => row.route ?? "Route to be confirmed",
-    render: (row) =>
-      row.route ? (
-        <code className="font-mono text-xs">GET {row.route}</code>
-      ) : (
-        <span className="text-ink2">Route to be confirmed</span>
-      ),
+    value: (row) => row.route,
+    render: (row) => <code className="font-mono text-xs">GET {row.route}</code>,
   },
-  { key: "view", header: "Source view", value: (row) => row.view },
+  { key: "roles", header: "Allowed roles", value: (row) => row.roles ?? "Not in the guide" },
   {
     key: "fields",
     header: "Fields",
@@ -30,15 +25,16 @@ const COLUMNS: DataTableColumn<DictionaryEndpoint>[] = [
 function FieldTable({ endpoint }: { endpoint: DictionaryEndpoint }) {
   return (
     <div>
-      {endpoint.route && (
-        <p className="mb-2 text-xs text-ink2">
-          For one estate: <code className="font-mono">GET {endpoint.route}/{"{estate_code}"}</code>
-        </p>
-      )}
+      <p className="mb-2 text-xs text-ink2">
+        For one estate:{" "}
+        <code className="font-mono">
+          GET {endpoint.route}?$filter=estate_code eq &apos;{"{estate_code}"}&apos;
+        </code>
+      </p>
       <table className="w-full min-w-[46rem] border-collapse text-left text-xs">
         <caption className="sr-only">Fields in {endpoint.name}</caption>
         <thead>
-          <tr className="border-b border-ink/10 text-ink2">
+          <tr className="border-b border-line text-ink2">
             {["Field", "Type", "Definition", "Source", "Refresh", "Sensitivity", "Status"].map((heading) => (
               <th key={heading} scope="col" className="py-1.5 pr-4 font-semibold whitespace-nowrap">
                 {heading}
@@ -46,7 +42,7 @@ function FieldTable({ endpoint }: { endpoint: DictionaryEndpoint }) {
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-ink/10">
+        <tbody className="divide-y divide-line">
           {endpoint.fields.map((field) => (
             <tr key={field.name} className="align-top text-ink">
               <td className="py-1.5 pr-4 font-mono whitespace-nowrap">{field.name}</td>

@@ -14,6 +14,11 @@ export function formatAedMillions(aed: number) {
   return `AED ${oneDecimal.format(aed / 1_000_000)}m`;
 }
 
+/** For values the API or a chart already holds in millions. */
+export function formatAedFromMillions(millions: number | null) {
+  return millions === null ? "—" : `AED ${oneDecimal.format(millions)}m`;
+}
+
 export function formatPercent(value: number) {
   return `${upToTwoDecimals.format(value)}%`;
 }

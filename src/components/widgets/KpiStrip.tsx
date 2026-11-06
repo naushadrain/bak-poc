@@ -1,10 +1,7 @@
 "use client";
 
-import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/Badge";
-import { Card } from "@/components/ui/Card";
-import { ErrorMessage } from "@/components/ui/ErrorMessage";
-import { SkeletonLoader } from "@/components/ui/SkeletonLoader";
+import { KpiGrid, KpiTile } from "@/components/ui/KpiTile";
 import type { PortalDataState } from "@/controllers/hooks/usePortalData";
 import {
   formatAedMillions,
@@ -18,31 +15,6 @@ import { getStatus, STATUS_LABELS } from "@/lib/status";
 import type { AssetMgmt, Finance, HSE, ServiceDelivery } from "@/models/interfaces";
 
 const NO_VALUE = "—";
-
-interface KpiTileProps {
-  label: string;
-  state: { isLoading: boolean; error: Error | null };
-  value: string;
-  detail: ReactNode;
-}
-
-export function KpiTile({ label, state, value, detail }: KpiTileProps) {
-  return (
-    <Card className="flex min-w-0 flex-col gap-1">
-      <h2 className="text-sm text-ink2">{label}</h2>
-      {state.isLoading ? (
-        <SkeletonLoader lines={2} className="h-6" label={`Loading ${label}`} />
-      ) : state.error ? (
-        <ErrorMessage>Unavailable. {state.error.message}</ErrorMessage>
-      ) : (
-        <>
-          <p className="text-2xl font-semibold text-ink tabular-nums sm:text-3xl">{value}</p>
-          <div className="text-xs text-ink2">{detail}</div>
-        </>
-      )}
-    </Card>
-  );
-}
 
 function getPpmCompletion(rows: ServiceDelivery[] | null) {
   const { portfolio, estates } = splitPortfolio(rows);
@@ -75,7 +47,7 @@ export function KpiStrip({ finance, serviceDelivery, assets, hse }: KpiStripProp
   const healthStatus = isNumber(health) ? getStatus(health) : null;
 
   return (
-    <section aria-label="Key performance indicators" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <KpiGrid label="Key performance indicators">
       <KpiTile
         label="Total OPEX (YTD)"
         state={finance}
@@ -100,6 +72,6 @@ export function KpiStrip({ finance, serviceDelivery, assets, hse }: KpiStripProp
         value={isNumber(ltiFreeDays) ? formatCount(ltiFreeDays) : NO_VALUE}
         detail="Since the last lost-time injury"
       />
-    </section>
+    </KpiGrid>
   );
 }

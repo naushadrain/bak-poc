@@ -1,7 +1,7 @@
 /**
- * Field names and types mirror src/models/interfaces. Definitions, sources, refresh
- * rates, sensitivity and status come from source_to_target_mapping.csv where it has
- * a row for the field.
+ * Field names and types mirror src/models/interfaces, which match the API's OpenAPI
+ * spec. Definitions, sources, refresh rates, sensitivity and status come from
+ * source_to_target_mapping.csv where it has a row for the field.
  */
 export interface DictionaryField {
   name: string;
@@ -16,9 +16,9 @@ export interface DictionaryField {
 export interface DictionaryEndpoint {
   name: string;
   interfaceName: string;
-  /** Null when no document states the route yet. */
-  route: string | null;
-  view: string | null;
+  route: string;
+  /** Roles allowed by the API integration guide. Null when the guide doesn't list the dataset. */
+  roles: string | null;
   fields: DictionaryField[];
 }
 
@@ -48,15 +48,15 @@ const SOURCE_FILE: DictionaryField = {
   definition: "File the record was ingested from.",
 };
 
-function kpiFields(valueDefinition: string): DictionaryField[] {
+function kpiFields(valueDefinition: string, hasTier = true): DictionaryField[] {
   return [
     ESTATE_CODE,
     { name: "kpi_id", type: "string", definition: "KPI identifier from the mapping, such as M041." },
     { name: "kpi_name", type: "string", definition: "KPI name, such as projects_by_stage:Mobilisation." },
-    { name: "value", type: "string | number", definition: valueDefinition },
+    { name: "value", type: "string", definition: valueDefinition },
     { name: "unit", type: "string", definition: "Unit of the value, such as count, % or AED." },
     CLIENT_CODE,
-    { name: "tier", type: "number", definition: "Estate tier." },
+    ...(hasTier ? [{ name: "tier", type: "number", definition: "Estate tier." }] : []),
     SYNCED_AT,
   ];
 }
@@ -65,8 +65,8 @@ export const DATA_DICTIONARY: DictionaryEndpoint[] = [
   {
     name: "Service Delivery",
     interfaceName: "ServiceDelivery",
-    route: "/portal/v1/service_delivery",
-    view: "vw_service_delivery",
+    route: "/api/vw_service_delivery",
+    roles: "excom, ops, client",
     fields: [
       ESTATE_CODE,
       CLIENT_CODE,
@@ -84,23 +84,23 @@ export const DATA_DICTIONARY: DictionaryEndpoint[] = [
   {
     name: "Asset Management",
     interfaceName: "AssetMgmt",
-    route: "/portal/v1/asset_mgmt",
-    view: "vw_asset_mgmt",
+    route: "/api/vw_asset_mgmt",
+    roles: "excom, ops, client",
     fields: [
       ESTATE_CODE,
       CLIENT_CODE,
       { name: "asset_count", type: "number", definition: "Count of active assets per estate.", source: "MRI CAFM", refresh: "Weekly", sensitivity: "Client", status: "Mapped" },
       { name: "asset_health_idx", type: "number", definition: "Invisible Care Index, 0-100. Weights are still to be confirmed.", source: "MRI CAFM", refresh: "Monthly", sensitivity: "Client", status: "Partial" },
       { name: "assets_beyond_life", type: "number", definition: "Count of assets older than their expected life.", source: "MRI CAFM", refresh: "Monthly", sensitivity: "Client", status: "Mapped" },
-      { name: "spares_value_aed_m", type: "number | null", definition: "Value of spares on hand, AED millions.", source: "D365 F&O", refresh: "Weekly", sensitivity: "Client", status: "Proposed" },
+      { name: "spares_value_aed_m", type: "number", definition: "Value of spares on hand, AED millions.", source: "D365 F&O", refresh: "Weekly", sensitivity: "Client", status: "Proposed" },
       SYNCED_AT,
     ],
   },
   {
     name: "Finance",
     interfaceName: "Finance",
-    route: "/portal/v1/finance",
-    view: "vw_finance",
+    route: "/api/vw_finance",
+    roles: "excom, fin",
     fields: [
       ESTATE_CODE,
       CLIENT_CODE,
@@ -113,8 +113,8 @@ export const DATA_DICTIONARY: DictionaryEndpoint[] = [
   {
     name: "Procurement",
     interfaceName: "Procurement",
-    route: "/portal/v1/procurement",
-    view: "vw_procurement",
+    route: "/api/vw_procurement",
+    roles: "excom, fin, client",
     fields: [
       ESTATE_CODE,
       CLIENT_CODE,
@@ -127,8 +127,8 @@ export const DATA_DICTIONARY: DictionaryEndpoint[] = [
   {
     name: "Projects",
     interfaceName: "Projects",
-    route: "/portal/v1/projects",
-    view: "vw_projects",
+    route: "/api/vw_projects",
+    roles: "excom, ops, fin, client",
     fields: [
       ESTATE_CODE,
       CLIENT_CODE,
@@ -140,31 +140,31 @@ export const DATA_DICTIONARY: DictionaryEndpoint[] = [
   {
     name: "Projects by Stage",
     interfaceName: "ProjectsByStage",
-    route: null,
-    view: null,
-    fields: kpiFields("Count of projects at the stage named in kpi_name."),
+    route: "/api/vw_projects_by_stage",
+    roles: "excom, ops, fin, client",
+    fields: kpiFields("Count of projects at the stage named in kpi_name, sent as text."),
   },
   {
     name: "HSE",
     interfaceName: "HSE",
-    route: "/portal/v1/hse",
-    view: "vw_hse",
+    route: "/api/vw_hse",
+    roles: "excom, ops, client",
     fields: [
       ESTATE_CODE,
       CLIENT_CODE,
       { name: "permits_valid_pct", type: "number", definition: "% of permits that are unexpired.", source: "MRI CAFM", refresh: "Weekly", sensitivity: "Client", status: "Partial" },
       { name: "incidents_mtd", type: "number", definition: "Count of incidents month to date.", source: "SharePoint", refresh: "Daily", sensitivity: "Internal", status: "TBC" },
-      { name: "lti_free_days", type: "number | null", definition: "Days since the last lost-time injury.", source: "SharePoint", refresh: "Daily", sensitivity: "Internal", status: "Proposed" },
-      { name: "near_miss_closeout_pct", type: "number | null", definition: "% of near misses closed, year to date.", source: "SharePoint", refresh: "Daily", sensitivity: "Internal", status: "Proposed" },
-      { name: "ptw_compliance_pct", type: "number | null", definition: "% of permits to work that are compliant, year to date.", source: "MRI CAFM", refresh: "Daily", sensitivity: "Client", status: "Proposed" },
+      { name: "lti_free_days", type: "number", definition: "Days since the last lost-time injury.", source: "SharePoint", refresh: "Daily", sensitivity: "Internal", status: "Proposed" },
+      { name: "near_miss_closeout_pct", type: "number", definition: "% of near misses closed, year to date.", source: "SharePoint", refresh: "Daily", sensitivity: "Internal", status: "Proposed" },
+      { name: "ptw_compliance_pct", type: "number", definition: "% of permits to work that are compliant, year to date.", source: "MRI CAFM", refresh: "Daily", sensitivity: "Client", status: "Proposed" },
       SYNCED_AT,
     ],
   },
   {
     name: "HR",
     interfaceName: "HR",
-    route: "/portal/v1/hr",
-    view: "vw_hr",
+    route: "/api/vw_hr",
+    roles: "excom, ops",
     fields: [
       ESTATE_CODE,
       CLIENT_CODE,
@@ -176,8 +176,8 @@ export const DATA_DICTIONARY: DictionaryEndpoint[] = [
   {
     name: "Invisible Care",
     interfaceName: "InvisibleCare",
-    route: "/portal/v1/invisible_care",
-    view: "vw_invisible_care",
+    route: "/api/vw_invisible_care",
+    roles: "excom, ops, client",
     fields: [
       ESTATE_CODE,
       CLIENT_CODE,
@@ -190,8 +190,8 @@ export const DATA_DICTIONARY: DictionaryEndpoint[] = [
   {
     name: "Sustainability",
     interfaceName: "Sustainability",
-    route: "/portal/v1/sustainability",
-    view: "vw_sustainability",
+    route: "/api/vw_sustainability",
+    roles: "excom, ops, client",
     fields: [
       ESTATE_CODE,
       CLIENT_CODE,
@@ -203,22 +203,22 @@ export const DATA_DICTIONARY: DictionaryEndpoint[] = [
   {
     name: "Approvals",
     interfaceName: "Approvals",
-    route: "/portal/v1/approvals",
-    view: "vw_approvals",
-    fields: kpiFields("Latest approval state per document class, such as Approved."),
+    route: "/api/vw_approvals",
+    roles: "excom",
+    fields: kpiFields("Latest approval state per document class, such as Approved.", false),
   },
   {
     name: "Gold KPI Values",
     interfaceName: "GoldKpiValues",
-    route: null,
-    view: null,
-    fields: kpiFields("KPI value: a number, a URL or a state, depending on the KPI."),
+    route: "/api/gold_kpi_values",
+    roles: null,
+    fields: kpiFields("KPI value sent as text: a number, a URL or a state, depending on the KPI."),
   },
   {
     name: "Estate Directory",
     interfaceName: "SecurityDimEstate",
-    route: null,
-    view: null,
+    route: "/api/security_dim_estate",
+    roles: "excom, ops, fin, client, admin",
     fields: [
       ESTATE_CODE,
       CLIENT_CODE,
@@ -236,8 +236,8 @@ export const DATA_DICTIONARY: DictionaryEndpoint[] = [
   {
     name: "User Access",
     interfaceName: "SecurityUserAccess",
-    route: null,
-    view: null,
+    route: "/api/security_user_access",
+    roles: "excom, admin",
     fields: [
       { name: "user_principal_name", type: "string", definition: "User's sign-in name." },
       { name: "role", type: "string", definition: "Access role, such as ESTATE_MANAGER." },

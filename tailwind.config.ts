@@ -10,6 +10,7 @@ const config: Config = {
         ink: "var(--ink)",
         ink2: "var(--ink2)",
         taupe: "var(--taupe)",
+        line: "var(--line)",
         good: "var(--good)",
         warn: "var(--warn)",
         crit: "var(--crit)",
@@ -17,6 +18,7 @@ const config: Config = {
         foreground: "var(--foreground)",
       },
       fontFamily: {
+        display: ["var(--font-source-serif)", "Georgia", "serif"],
         sans: ["var(--font-geist-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
         mono: ["var(--font-geist-mono)", "ui-monospace", "monospace"],
       },

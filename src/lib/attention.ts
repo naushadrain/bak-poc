@@ -10,7 +10,10 @@ export interface AttentionItem {
   message: string;
 }
 
-export function getSeverity(value: number, limits: { warn: number; crit: number }) {
+export function getSeverity(
+  value: number,
+  limits: { warn: number; crit: number },
+): AttentionItem["severity"] | null {
   if (value > limits.crit) return "crit";
   if (value > limits.warn) return "warn";
   return null;

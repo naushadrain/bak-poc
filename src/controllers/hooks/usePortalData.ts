@@ -15,16 +15,16 @@ interface SettledRequest<T> {
   error: Error | null;
 }
 
-/** Shared by the per-domain hooks. Fetches when the resource or estate changes. */
-export function usePortalData<T>(resource: string, estate_code?: string): PortalDataState<T> {
-  const requestKey = `${resource}/${estate_code ?? ""}`;
+/** Shared by the per-domain hooks. Fetches when the entity or estate changes. */
+export function usePortalData<T>(entity: string, estate_code?: string): PortalDataState<T> {
+  const requestKey = `${entity}/${estate_code ?? ""}`;
   const [settled, setSettled] = useState<SettledRequest<T> | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
     const { signal } = controller;
 
-    fetchPortalRows<T>(resource, estate_code, signal).then(
+    fetchPortalRows<T>(entity, estate_code, signal).then(
       (data) => {
         if (!signal.aborted) setSettled({ requestKey, data, error: null });
       },
@@ -36,7 +36,7 @@ export function usePortalData<T>(resource: string, estate_code?: string): Portal
     );
 
     return () => controller.abort();
-  }, [requestKey, resource, estate_code]);
+  }, [requestKey, entity, estate_code]);
 
   // A result only counts if it belongs to the current request, so one estate's
   // rows are never shown under another while the new request is loading.

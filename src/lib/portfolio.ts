@@ -44,6 +44,36 @@ export function getOpexPlan({ opex_ytd_aed, opex_var_pct }: Finance) {
   return ratio > 0 ? opex_ytd_aed / ratio : null;
 }
 
+export function sumOf<T>(rows: T[], pick: (row: T) => number | null) {
+  const values = rows.map(pick).filter(isNumber);
+  return values.length > 0 ? values.reduce((total, value) => total + value, 0) : null;
+}
+
+export interface FinanceRow {
+  estate_code: string;
+  actualM: number;
+  planM: number | null;
+  variancePct: number;
+  capexM: number | null;
+}
+
+/** Estate rows in AED millions, largest spend first. */
+export function getFinanceRows(rows: Finance[] | null): FinanceRow[] {
+  return splitPortfolio(rows)
+    .estates.filter((row) => isNumber(row.opex_ytd_aed))
+    .map((row) => {
+      const plan = getOpexPlan(row);
+      return {
+        estate_code: row.estate_code,
+        actualM: row.opex_ytd_aed / 1_000_000,
+        planM: plan === null ? null : plan / 1_000_000,
+        variancePct: row.opex_var_pct,
+        capexM: isNumber(row.capex_committed_aed) ? row.capex_committed_aed / 1_000_000 : null,
+      };
+    })
+    .sort((a, b) => b.actualM - a.actualM);
+}
+
 /** Summing estates matches the portfolio total in the sample data. */
 export function getPortfolioOpex(rows: Finance[] | null) {
   const { portfolio, estates } = splitPortfolio(rows);

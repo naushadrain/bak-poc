@@ -1,5 +1,7 @@
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { PageHero } from "@/components/ui/PageHero";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { DataDictionary } from "@/components/widgets/DataDictionary";
 import { STATUS_LABELS } from "@/lib/status";
 import { ATTENTION_LIMITS, HEALTH_THRESHOLDS } from "@/models/constants/thresholds";
@@ -35,28 +37,39 @@ const READING_NOTES = [
     detail: `OPEX variance above ${opexVariancePct.warn}% or any open environmental alert shows a warning. Variance above ${opexVariancePct.crit}%, or more than ${envAlertsOpen.crit} open alerts, shows as critical.`,
   },
   {
+    term: "Access",
+    detail: "Allowed roles in the Data Dictionary come from the API integration guide. When the API denies a role, a permission notice replaces the data.",
+  },
+  {
     term: "Field status",
-    detail: "Mapped fields are agreed. Partial, Proposed, TBC and Gap fields may still change, as recorded in the source-to-target mapping.",
+    detail: "Taken from the source-to-target mapping. Fields marked Partial, Proposed, TBC or Gap may still change.",
   },
 ];
 
 export default function DefinitionsPage() {
   return (
     <div className="space-y-6 p-4 sm:p-6 lg:p-8">
+      <PageHero
+        eyebrow="Governance"
+        title="Definitions and method"
+        description="How each figure in this portal is defined, where it comes from and how often it refreshes."
+      />
       <div className="grid gap-6 xl:grid-cols-2">
         <Card className="space-y-4">
-          <div>
-            <h2 className="text-base font-semibold text-ink">Invisible Care Index</h2>
-            <p className="text-xs text-ink2">
-              Shown as Asset Health across this portal (API field{" "}
-              <code className="font-mono">asset_health_idx</code>).
-            </p>
-          </div>
+          <SectionHeader
+            title="Invisible Care Index"
+            subtitle={
+              <>
+                Shown as Asset Health across this portal (API field{" "}
+                <code className="font-mono">asset_health_idx</code>).
+              </>
+            }
+          />
           <p className="rounded-md bg-stone p-3 font-mono text-sm wrap-break-word text-ink">
             Index = 0.40 × Environmental + 0.30 × PPM compliance + 0.20 × Critical work orders + 0.10
             × Asset condition
           </p>
-          <dl className="divide-y divide-ink/10">
+          <dl className="divide-y divide-line">
             {INDEX_COMPONENTS.map(({ weight, name, description }) => (
               <div key={name} className="flex gap-3 py-2 text-sm">
                 <dt className="w-10 shrink-0 font-medium text-ink tabular-nums">{weight}</dt>
@@ -84,8 +97,8 @@ export default function DefinitionsPage() {
         </Card>
 
         <Card className="space-y-3">
-          <h2 className="text-base font-semibold text-ink">Reading the Numbers</h2>
-          <dl className="divide-y divide-ink/10">
+          <SectionHeader title="Reading the Numbers" />
+          <dl className="divide-y divide-line">
             {READING_NOTES.map(({ term, detail }) => (
               <div key={term} className="py-2 text-sm">
                 <dt className="font-medium text-ink">{term}</dt>
@@ -97,15 +110,10 @@ export default function DefinitionsPage() {
       </div>
 
       <section className="space-y-3">
-        <div>
-          <h2 className="text-base font-semibold text-ink">
-            Data Dictionary
-          </h2>
-          <p className="text-xs text-ink2">
-            Every API dataset and its fields. Expand a row to see them. Routes and types are
-            provisional until checked against the API specification.
-          </p>
-        </div>
+        <SectionHeader
+          title="Data Dictionary"
+          subtitle="Every API dataset and its fields, checked against the API's OpenAPI specification. Expand a row to see them."
+        />
         <DataDictionary />
       </section>
     </div>

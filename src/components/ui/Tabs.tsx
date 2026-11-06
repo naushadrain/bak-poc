@@ -41,7 +41,7 @@ export function Tabs({ label, tabs }: TabsProps) {
       <div
         role="tablist"
         aria-label={label}
-        className="flex gap-1 overflow-x-auto border-b border-ink/10"
+        className="flex gap-1 overflow-x-auto border-b border-line"
       >
         {tabs.map((tab, index) => {
           const isActive = tab.id === activeTab.id;
@@ -60,7 +60,7 @@ export function Tabs({ label, tabs }: TabsProps) {
               onClick={() => setActiveId(tab.id)}
               onKeyDown={(event) => handleKeyDown(event, index)}
               className={cn(
-                "relative shrink-0 px-3 py-2.5 text-sm whitespace-nowrap transition-colors",
+                "relative shrink-0 px-3 py-3 text-xs tracking-wider whitespace-nowrap uppercase transition-colors",
                 isActive ? "font-medium text-ink" : "text-ink2 hover:text-ink",
               )}
             >
@@ -68,7 +68,7 @@ export function Tabs({ label, tabs }: TabsProps) {
               {isActive && (
                 <motion.span
                   layoutId={`${baseId}-indicator`}
-                  className="absolute inset-x-0 -bottom-px h-0.5 bg-ink"
+                  className="absolute inset-x-0 -bottom-px h-0.5 bg-taupe"
                 />
               )}
             </button>

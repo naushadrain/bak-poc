@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, type Ref } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRight, Menu } from "lucide-react";
@@ -76,7 +77,7 @@ function PageHeading() {
           })}
         </ol>
       </nav>
-      <h1 className="truncate text-base font-semibold text-ink sm:text-xl">{pageTitle}</h1>
+      <h1 className="truncate font-display text-base text-ink sm:text-xl">{pageTitle}</h1>
     </>
   );
 }
@@ -90,7 +91,7 @@ interface HeaderProps {
 
 export function Header({ menuButtonRef, isMenuOpen, menuId, onOpenMenu }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-ink/10 bg-paper px-4 py-3 sm:gap-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-line bg-stone px-4 py-3 sm:gap-4 sm:px-6 lg:px-8">
       <button
         ref={menuButtonRef}
         type="button"
@@ -98,7 +99,7 @@ export function Header({ menuButtonRef, isMenuOpen, menuId, onOpenMenu }: Header
         aria-label="Open navigation menu"
         aria-expanded={isMenuOpen}
         aria-controls={menuId}
-        className="-ml-2 shrink-0 rounded-md p-2 text-ink2 hover:bg-stone hover:text-ink lg:hidden"
+        className="-ml-2 shrink-0 rounded-md p-2 text-ink2 hover:bg-paper hover:text-ink lg:hidden"
       >
         <Menu aria-hidden="true" className="size-5" />
       </button>
@@ -112,14 +113,14 @@ export function Header({ menuButtonRef, isMenuOpen, menuId, onOpenMenu }: Header
 
       <LiveClock />
 
-      {/* TODO: replace with the company logo. */}
-      <div
-        role="img"
-        aria-label="Company logo placeholder"
-        className="flex size-10 shrink-0 items-center justify-center rounded-md border border-dashed border-taupe text-[10px] text-ink2"
-      >
-        Logo
-      </div>
+      <Image
+        src="/wasael-logo.svg"
+        alt="Wasael Property Management"
+        width={64}
+        height={44}
+        unoptimized
+        className="h-11 w-auto shrink-0"
+      />
     </header>
   );
 }

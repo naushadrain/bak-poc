@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { CircularGauge } from "@/components/ui/CircularGauge";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { SkeletonLoader } from "@/components/ui/SkeletonLoader";
 import { useAssetData } from "@/controllers/hooks/useAssetData";
 import { useEstateDimData } from "@/controllers/hooks/useEstateDimData";
@@ -30,6 +31,10 @@ import { ApiError } from "@/services/portalApi";
 
 function isNotFoundError(error: Error | null) {
   return error instanceof ApiError && error.status === 404;
+}
+
+function isForbiddenError(error: Error | null) {
+  return error instanceof ApiError && error.status === 403;
 }
 
 function show(value: number | null | undefined, format: (value: number) => string) {
@@ -60,18 +65,15 @@ interface MetricCardProps {
 function MetricCard({ title, subtitle, isLoading, error, hasRow, metrics }: MetricCardProps) {
   return (
     <Card className="flex min-w-0 flex-col gap-3">
-      <div>
-        <h3 className="text-base font-semibold text-ink">{title}</h3>
-        <p className="text-xs text-ink2">{subtitle}</p>
-      </div>
+      <SectionHeader title={title} subtitle={subtitle} />
       {isLoading ? (
         <SkeletonLoader lines={3} className="h-6" label={`Loading ${title}`} />
       ) : error && !isNotFoundError(error) ? (
-        <ErrorMessage>{title} data is unavailable. {error.message}</ErrorMessage>
+        <ErrorMessage error={error}>{title} data is unavailable. {error.message}</ErrorMessage>
       ) : !hasRow ? (
         <p className="text-sm text-ink2">No {title.toLowerCase()} data for this estate.</p>
       ) : (
-        <dl className="divide-y divide-ink/10">
+        <dl className="divide-y divide-line">
           {metrics.map(({ label, value, badge }) => (
             <div key={label} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 py-2 text-sm">
               <dt className="text-ink2">{label}</dt>
@@ -92,7 +94,7 @@ function AssetNotFound({ estate_code }: { estate_code: string }) {
     <div className="flex flex-1 items-center justify-center p-4 sm:p-6 lg:p-8">
       <Card className="flex w-full max-w-md flex-col items-center gap-3 p-8 text-center">
         <SearchX aria-hidden="true" className="size-10 text-taupe" />
-        <h2 className="text-xl font-semibold text-ink">Asset Not Found</h2>
+        <h2 className="font-display text-2xl font-normal text-ink">Asset Not Found</h2>
         <p className="text-sm wrap-break-word text-ink2">
           We couldn&apos;t find an estate with the code{" "}
           <span className="font-medium text-ink">{estate_code}</span>. Check the code, or that you
@@ -125,12 +127,18 @@ export function PropertyDetails({ estate_code }: { estate_code: string }) {
   const dimRow = findEstateRow(estateDim.data, estate_code);
 
   // The estate lookup is left out because it only adds the emirate. One view having
-  // no row is a gap in one card. The estate is only missing if every view agrees.
+  // no row is a gap in one card, so the estate is only missing if every view agrees.
+  // The API answers an unknown code with no rows. A view the role can't read has no
+  // say, because a permission denial doesn't mean the estate is missing.
   const coreStates: PortalDataState<unknown>[] = [finance, serviceDelivery, assets, hr, invisibleCare];
   const hasAnyRow = Boolean(financeRow || serviceRow || assetRow || hrRow || careRow);
   const allSettled = coreStates.every((state) => !state.isLoading);
+  const readableStates = coreStates.filter((state) => !isForbiddenError(state.error));
   const isMissing =
-    allSettled && !hasAnyRow && coreStates.every((state) => !state.error || isNotFoundError(state.error));
+    allSettled &&
+    !hasAnyRow &&
+    readableStates.length > 0 &&
+    readableStates.every((state) => !state.error || isNotFoundError(state.error));
 
   if (isMissing) return <AssetNotFound estate_code={estate_code} />;
 
@@ -142,8 +150,8 @@ export function PropertyDetails({ estate_code }: { estate_code: string }) {
     <div className="space-y-6 p-4 sm:p-6 lg:p-8">
       <Card className="flex flex-wrap items-center justify-between gap-4">
         <div className="min-w-0">
-          <p className="text-xs text-ink2">Estate</p>
-          <h2 className="text-2xl font-semibold wrap-break-word text-ink sm:text-3xl">
+          <p className="text-[11px] tracking-[0.18em] text-ink2 uppercase">Estate</p>
+          <h2 className="mt-1 font-display text-3xl font-normal wrap-break-word text-ink sm:text-4xl">
             {dimRow?.estate_code ?? assetRow?.estate_code ?? estate_code}
           </h2>
           <div className="mt-1 text-sm text-ink2">
